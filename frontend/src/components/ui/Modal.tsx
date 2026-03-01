@@ -16,7 +16,6 @@ export default function Modal({ open, onClose, children }: Props) {
       if (e.key === "Escape") onClose();
     };
     document.addEventListener("keydown", handler);
-    // Focus trap: focus the panel
     panelRef.current?.focus();
     return () => document.removeEventListener("keydown", handler);
   }, [open, onClose]);
@@ -29,14 +28,16 @@ export default function Modal({ open, onClose, children }: Props) {
       onClick={onClose}
     >
       {/* Backdrop */}
-      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm motion-safe:animate-fade-in" />
+      <div className="absolute inset-0 bg-black/70 backdrop-blur-md motion-safe:animate-fade-in" />
       {/* Panel */}
       <div
         ref={panelRef}
         tabIndex={-1}
         onClick={(e) => e.stopPropagation()}
-        className="relative bg-gray-900 border border-gray-800 rounded-xl shadow-xl max-w-md w-full p-6 motion-safe:animate-fade-up focus:outline-none"
+        className="relative glass-strong rounded-2xl shadow-xl shadow-black/40 max-w-md w-full p-6 motion-safe:animate-fade-up focus:outline-none"
       >
+        {/* Gradient top border accent */}
+        <div className="absolute top-0 left-4 right-4 h-px bg-gradient-to-r from-transparent via-accent/30 to-transparent" />
         {children}
       </div>
     </div>

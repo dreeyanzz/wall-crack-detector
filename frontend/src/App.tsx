@@ -32,7 +32,7 @@ export default function App() {
       </div>
 
       {/* Sidebar */}
-      <aside className="w-full lg:w-80 flex flex-col gap-2 shrink-0 lg:max-h-[calc(100vh-4.5rem)] lg:overflow-y-auto">
+      <aside className="w-full lg:w-80 flex flex-col gap-2.5 shrink-0 lg:max-h-[calc(100vh-4.5rem)] lg:overflow-y-auto">
         <CollapsiblePanel title="Statistics" defaultOpen storageKey="stats">
           <StatsPanel stats={stats} />
         </CollapsiblePanel>
@@ -46,7 +46,7 @@ export default function App() {
           storageKey="screenshots"
           badge={
             stats.screenshots > 0 ? (
-              <span className="text-xs text-accent bg-accent/10 px-1.5 py-0.5 rounded-full font-mono normal-case">
+              <span className="text-xs gradient-text font-semibold bg-accent/10 px-1.5 py-0.5 rounded-full font-mono normal-case">
                 {stats.screenshots}
               </span>
             ) : undefined

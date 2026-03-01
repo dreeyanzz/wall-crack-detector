@@ -11,10 +11,10 @@ const ICONS: Record<ToastType, string> = {
 };
 
 const COLORS: Record<ToastType, string> = {
-  success: "text-green-400 border-green-500/30 bg-green-500/10",
-  error: "text-red-400 border-red-500/30 bg-red-500/10",
-  warning: "text-yellow-400 border-yellow-500/30 bg-yellow-500/10",
-  info: "text-cyan-400 border-cyan-500/30 bg-cyan-500/10",
+  success: "text-green-400 border-green-500/20 bg-green-500/10",
+  error: "text-red-400 border-red-500/20 bg-red-500/10",
+  warning: "text-yellow-400 border-yellow-500/20 bg-yellow-500/10",
+  info: "text-indigo-400 border-indigo-500/20 bg-indigo-500/10",
 };
 
 const AUTO_DISMISS_MS = 4000;
@@ -49,7 +49,7 @@ function ToastNotification({
   return (
     <div
       className={`motion-safe:${toast.dismissing ? "animate-slide-out-right" : "animate-slide-in-right"}
-        flex items-start gap-3 px-4 py-3 rounded-lg border backdrop-blur-sm shadow-lg min-w-[280px] max-w-[380px]
+        flex items-start gap-3 px-4 py-3 rounded-xl border backdrop-blur-xl shadow-lg shadow-black/30 min-w-[280px] max-w-[380px]
         ${COLORS[toast.type]}`}
     >
       <svg className="w-5 h-5 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -58,14 +58,14 @@ function ToastNotification({
       <p className="text-sm flex-1 text-gray-200">{toast.message}</p>
       <button
         onClick={() => onDismiss(toast.id)}
-        className="text-gray-500 hover:text-gray-300 shrink-0"
+        className="text-gray-500 hover:text-gray-300 shrink-0 transition-colors"
       >
         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
         </svg>
       </button>
       {/* Progress bar */}
-      <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-transparent overflow-hidden rounded-b-lg">
+      <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-transparent overflow-hidden rounded-b-xl">
         <div
           className="h-full bg-current opacity-30 transition-none"
           style={{ width: `${progress}%` }}

@@ -1,4 +1,4 @@
-import type { Stats, Settings, Screenshot } from "./types";
+import type { Stats, Settings, Screenshot, Camera } from "./types";
 
 const BASE = "/api";
 
@@ -45,6 +45,9 @@ export const takeScreenshot = () => json<{ status: string; filename?: string }>(
 export const fetchScreenshots = () => json<Screenshot[]>(fetch(`${BASE}/screenshots`));
 export const deleteScreenshot = (name: string) =>
   json<{ status: string }>(fetch(`${BASE}/screenshots/${encodeURIComponent(name)}`, { method: "DELETE" }));
+
+// Cameras
+export const fetchCameras = () => json<Camera[]>(fetch(`${BASE}/cameras`));
 
 // Stream URL (not a fetch — used as <img> src)
 export const streamUrl = (cacheBust: number) => `${BASE}/stream?t=${cacheBust}`;

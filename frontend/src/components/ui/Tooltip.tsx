@@ -17,9 +17,9 @@ export default function Tooltip({ text, children }: Props) {
     >
       {children}
       {show && (
-        <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-1.5 text-xs text-gray-200 bg-gray-800 border border-gray-700 rounded-lg shadow-lg whitespace-nowrap z-50 motion-safe:animate-fade-in pointer-events-none">
+        <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-1.5 text-xs text-gray-200 glass-strong rounded-xl shadow-lg whitespace-nowrap z-50 motion-safe:animate-fade-in pointer-events-none">
           {text}
-          <span className="absolute top-full left-1/2 -translate-x-1/2 -mt-px border-4 border-transparent border-t-gray-800" />
+          <span className="absolute top-full left-1/2 -translate-x-1/2 -mt-px border-4 border-transparent border-t-white/10" />
         </span>
       )}
     </span>

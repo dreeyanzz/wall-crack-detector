@@ -73,9 +73,12 @@ export default function ControlBar({ running, paused, fps, onStart }: Props) {
           <button
             onClick={handleStart}
             disabled={starting}
-            className="inline-flex items-center gap-2 px-5 py-2 rounded-lg bg-gradient-to-r from-cyan-500 to-cyan-400 text-gray-950 font-semibold shadow-glow-sm hover:shadow-glow-md transition-all disabled:opacity-60 focus-visible:ring-2 focus-visible:ring-accent/50 focus-visible:ring-offset-2 focus-visible:ring-offset-gray-950"
+            className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl gradient-accent text-white font-semibold shadow-glow-md hover:shadow-glow-lg hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 disabled:opacity-60 focus-visible:ring-2 focus-visible:ring-accent/50 focus-visible:ring-offset-2 focus-visible:ring-offset-[#06060c]"
           >
-            {starting && <Spinner size="sm" className="text-gray-950" />}
+            {starting && <Spinner size="sm" className="text-white" />}
+            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M8 5.14v14l11-7-11-7z" />
+            </svg>
             Start
           </button>
         ) : (
@@ -83,21 +86,36 @@ export default function ControlBar({ running, paused, fps, onStart }: Props) {
             <button
               onClick={handlePause}
               disabled={pausing}
-              className="inline-flex items-center gap-2 px-5 py-2 rounded-lg bg-gray-800 border border-gray-700 text-gray-300 hover:border-gray-600 hover:text-white transition-all disabled:opacity-60 focus-visible:ring-2 focus-visible:ring-accent/50 focus-visible:ring-offset-2 focus-visible:ring-offset-gray-950"
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl glass-card text-gray-300 hover:text-white hover:border-white/10 transition-all duration-200 disabled:opacity-60 focus-visible:ring-2 focus-visible:ring-accent/50 focus-visible:ring-offset-2 focus-visible:ring-offset-[#06060c]"
             >
               {pausing && <Spinner size="sm" />}
+              {paused ? (
+                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M8 5.14v14l11-7-11-7z" />
+                </svg>
+              ) : (
+                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                  <rect x="6" y="4" width="4" height="16" rx="1" />
+                  <rect x="14" y="4" width="4" height="16" rx="1" />
+                </svg>
+              )}
               {paused ? "Resume" : "Pause"}
             </button>
             <button
               onClick={() => setShowStopConfirm(true)}
-              className="px-5 py-2 rounded-lg border border-red-500/40 text-red-400 hover:bg-red-500/10 transition-all focus-visible:ring-2 focus-visible:ring-red-500/50 focus-visible:ring-offset-2 focus-visible:ring-offset-gray-950"
+              className="px-5 py-2.5 rounded-xl border border-danger/30 text-danger hover:bg-danger/10 transition-all duration-200 focus-visible:ring-2 focus-visible:ring-danger/50 focus-visible:ring-offset-2 focus-visible:ring-offset-[#06060c]"
             >
-              Stop
+              <span className="flex items-center gap-2">
+                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                  <rect x="6" y="6" width="12" height="12" rx="2" />
+                </svg>
+                Stop
+              </span>
             </button>
             <button
               onClick={handleScreenshot}
               disabled={screenshotting}
-              className="inline-flex items-center gap-2 px-5 py-2 rounded-lg bg-gray-800 border border-gray-700 text-gray-300 hover:border-gray-600 hover:text-white transition-all disabled:opacity-60 focus-visible:ring-2 focus-visible:ring-accent/50 focus-visible:ring-offset-2 focus-visible:ring-offset-gray-950"
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl glass-card text-gray-300 hover:text-white hover:border-white/10 transition-all duration-200 disabled:opacity-60 focus-visible:ring-2 focus-visible:ring-accent/50 focus-visible:ring-offset-2 focus-visible:ring-offset-[#06060c]"
             >
               {screenshotting ? (
                 <Spinner size="sm" />
@@ -111,8 +129,8 @@ export default function ControlBar({ running, paused, fps, onStart }: Props) {
             </button>
 
             {/* FPS badge */}
-            <span className="ml-auto bg-gray-800/50 border border-gray-700/50 rounded-full px-3 py-1 font-mono text-xs text-gray-400">
-              <span className="text-accent">{fps}</span> FPS
+            <span className="ml-auto glass rounded-full px-3.5 py-1.5 font-mono text-xs text-gray-400">
+              <span className="gradient-text font-semibold">{fps}</span> FPS
             </span>
           </>
         )}
@@ -122,8 +140,8 @@ export default function ControlBar({ running, paused, fps, onStart }: Props) {
       <Modal open={showStopConfirm} onClose={() => setShowStopConfirm(false)}>
         <div className="space-y-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-red-500/10 flex items-center justify-center">
-              <svg className="w-5 h-5 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <div className="w-10 h-10 rounded-full bg-danger/10 flex items-center justify-center">
+              <svg className="w-5 h-5 text-danger" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
             </div>
@@ -135,14 +153,14 @@ export default function ControlBar({ running, paused, fps, onStart }: Props) {
           <div className="flex justify-end gap-2 pt-2">
             <button
               onClick={() => setShowStopConfirm(false)}
-              className="px-4 py-2 rounded-lg bg-gray-800 border border-gray-700 text-gray-300 hover:border-gray-600 transition-colors text-sm"
+              className="px-4 py-2 rounded-xl glass-card text-gray-300 hover:text-white transition-all text-sm"
             >
               Cancel
             </button>
             <button
               onClick={handleStop}
               disabled={stopping}
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-red-600 hover:bg-red-500 text-white font-medium transition-colors text-sm disabled:opacity-60"
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-danger hover:bg-danger/90 text-white font-medium transition-all text-sm shadow-lg shadow-danger/20 disabled:opacity-60"
             >
               {stopping && <Spinner size="sm" className="text-white" />}
               Stop Detection

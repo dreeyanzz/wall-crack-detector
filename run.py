@@ -73,25 +73,39 @@ def ensure_model() -> None:
         sys.exit(1)
 
 
+def _local_ip() -> str:
+    import socket
+    try:
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        s.connect(("8.8.8.8", 80))
+        ip = s.getsockname()[0]
+        s.close()
+        return ip
+    except Exception:
+        return "127.0.0.1"
+
+
 def start_server() -> None:
     import threading
     import webbrowser
     import time
 
-    host = "127.0.0.1"
+    host = "0.0.0.0"
     port = 8000
+    local_ip = _local_ip()
 
     def _open_browser():
         time.sleep(1.5)
-        webbrowser.open(f"http://{host}:{port}")
+        webbrowser.open(f"http://127.0.0.1:{port}")
 
     threading.Thread(target=_open_browser, daemon=True).start()
 
     status(f"Starting server...  done")
     print()
-    print(f"  App is running at http://{host}:{port}")
-    print(f"  Your browser should open automatically.")
+    print(f"  Local:   http://127.0.0.1:{port}")
+    print(f"  Network: http://{local_ip}:{port}")
     print()
+    print(f"  Your browser should open automatically.")
     print(f"  Press Ctrl+C to stop.")
     print()
 

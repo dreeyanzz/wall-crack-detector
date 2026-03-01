@@ -25,10 +25,12 @@ export default function CollapsiblePanel({ title, defaultOpen = false, storageKe
   }, [open, storageKey]);
 
   return (
-    <div className="bg-gray-900 border border-gray-800/50 rounded-xl">
+    <div className="glass-card rounded-xl overflow-hidden">
+      {/* Gradient top accent line */}
+      <div className="h-px bg-gradient-to-r from-transparent via-accent/20 to-transparent" />
       <button
         onClick={() => setOpen(!open)}
-        className="w-full flex items-center justify-between px-3 py-2.5 text-xs font-semibold text-gray-400 uppercase tracking-wider hover:text-gray-300 transition-colors focus-visible:ring-2 focus-visible:ring-accent/50 focus-visible:ring-offset-2 focus-visible:ring-offset-gray-950 focus:outline-none"
+        className="w-full flex items-center justify-between px-4 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider hover:text-gray-200 transition-colors focus-visible:ring-2 focus-visible:ring-accent/50 focus-visible:ring-offset-2 focus-visible:ring-offset-[#06060c] focus:outline-none"
       >
         <span className="flex items-center gap-2">
           {title}
@@ -49,7 +51,7 @@ export default function CollapsiblePanel({ title, defaultOpen = false, storageKe
         style={{ gridTemplateRows: open ? "1fr" : "0fr" }}
       >
         <div className="overflow-hidden min-h-0">
-          <div className="px-3 pb-3">
+          <div className="px-4 pb-4">
             {children}
           </div>
         </div>

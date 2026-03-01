@@ -10,7 +10,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 
 from backend.detector import DetectionEngine
-from backend.routes import stream, controls, settings, stats, screenshots
+from backend.routes import stream, controls, settings, stats, screenshots, cameras
 
 
 def _find_frontend_dist() -> Path:
@@ -28,6 +28,7 @@ app = FastAPI(title="Crack Detection System")
 # Register API routes under /api
 for module in (stream, controls, settings, stats, screenshots):
     app.include_router(module.create_router(engine), prefix="/api")
+app.include_router(cameras.create_router(), prefix="/api")
 
 # Serve built React frontend (production)
 FRONTEND_DIST = _find_frontend_dist()

@@ -20,3 +20,8 @@ export interface Screenshot {
   name: string;
   size: number;
 }
+
+export interface Camera {
+  index: number;
+  label: string;
+}
