@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Body
+from fastapi import APIRouter, Body, HTTPException
 
 from backend.detector import DetectionEngine
 
@@ -12,6 +12,9 @@ def create_router(engine: DetectionEngine) -> APIRouter:
 
     @router.put("/settings")
     def update_settings(data: dict = Body(...)):
-        return engine.update_settings(data)
+        try:
+            return engine.update_settings(data)
+        except ValueError as e:
+            raise HTTPException(status_code=400, detail=str(e))
 
     return router

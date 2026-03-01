@@ -35,7 +35,7 @@ function StatCard({
           </svg>
         </div>
         <div className="min-w-0">
-          <div className="text-[10px] text-gray-500 uppercase tracking-wider leading-tight">{label}</div>
+          <div className="text-xs text-gray-500 uppercase tracking-wider leading-tight">{label}</div>
           <div className="text-xl font-bold text-white leading-tight">
             <AnimatedNumber value={value} />
           </div>

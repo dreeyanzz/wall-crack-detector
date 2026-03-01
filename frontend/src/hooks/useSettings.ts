@@ -15,7 +15,17 @@ export function useSettings() {
   const [settings, setSettings] = useState<Settings>(DEFAULT_SETTINGS);
 
   useEffect(() => {
-    fetchSettings().then(setSettings).catch(() => {});
+    let active = true;
+    const load = async () => {
+      try {
+        const data = await fetchSettings();
+        if (active) setSettings(data);
+      } catch {
+        // ignore — defaults are already set
+      }
+    };
+    load();
+    return () => { active = false; };
   }, []);
 
   const update = useCallback(async (patch: Partial<Settings>) => {

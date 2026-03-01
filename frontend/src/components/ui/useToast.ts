@@ -22,11 +22,11 @@ export const ToastContext = createContext<ToastContextValue>({
 });
 
 export function useToast() {
-  const ctx = useContext(ToastContext);
+  const { addToast } = useContext(ToastContext);
   return {
-    success: useCallback((msg: string) => ctx.addToast("success", msg), [ctx]),
-    error: useCallback((msg: string) => ctx.addToast("error", msg), [ctx]),
-    warning: useCallback((msg: string) => ctx.addToast("warning", msg), [ctx]),
-    info: useCallback((msg: string) => ctx.addToast("info", msg), [ctx]),
+    success: useCallback((msg: string) => addToast("success", msg), [addToast]),
+    error: useCallback((msg: string) => addToast("error", msg), [addToast]),
+    warning: useCallback((msg: string) => addToast("warning", msg), [addToast]),
+    info: useCallback((msg: string) => addToast("info", msg), [addToast]),
   };
 }

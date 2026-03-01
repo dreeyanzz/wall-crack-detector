@@ -5,7 +5,6 @@ venv/
 node_modules/
 frontend/dist/
 screenshots/*.jpg
-faces/
 *.pt
 .env
 .claude/settings.local.json

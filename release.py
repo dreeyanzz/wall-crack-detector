@@ -1,5 +1,5 @@
 """
-Create a GitHub Release with the built PersonDetector.zip.
+Create a GitHub Release with the built CrackDetector.zip.
 
 Usage:
     python release.py v1.0.0
@@ -12,11 +12,11 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent
-ZIP_PATH = ROOT / "dist" / "PersonDetector.zip"
+ZIP_PATH = ROOT / "dist" / "CrackDetector.zip"
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Build and release PersonDetector")
+    parser = argparse.ArgumentParser(description="Build and release CrackDetector")
     parser.add_argument("version", help="Release tag, e.g. v1.0.0")
     parser.add_argument("--notes", default="", help="Release notes (optional)")
     args = parser.parse_args()

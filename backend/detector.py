@@ -87,6 +87,8 @@ class DetectionEngine:
 
     def _load_model(self) -> None:
         model_path = MODEL_DIR / self._model_name
+        if not model_path.exists():
+            raise FileNotFoundError(f"Model file not found: {model_path}")
         self._model = YOLO(str(model_path))
 
     # ------------------------------------------------------------------
@@ -206,6 +208,8 @@ class DetectionEngine:
             if "model_name" in data:
                 new_model = data["model_name"]
                 if new_model != self._model_name:
+                    if not (MODEL_DIR / new_model).exists():
+                        raise ValueError(f"Model file not found: {new_model}")
                     self._model_name = new_model
                     reload_model = True
 
@@ -271,12 +275,15 @@ class DetectionEngine:
                 with self._lock:
                     if not self._running:
                         break
-                    if self._paused:
-                        continue
+                    paused = self._paused
                     cap = self._cap
                     conf = self._confidence
                     show_labels = self._show_labels
                     show_conf = self._show_confidence
+
+                if paused:
+                    time.sleep(0.05)
+                    continue
 
                 if cap is None:
                     break
@@ -326,11 +333,6 @@ class DetectionEngine:
 
                 # Signal waiting MJPEG generators
                 self._frame_event.set()
-
-                # small sleep when paused to avoid busy-loop
-                with self._lock:
-                    if self._paused:
-                        time.sleep(0.1)
 
             except Exception as e:
                 print(f"[detection-loop] error: {e}")

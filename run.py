@@ -1,5 +1,5 @@
 """
-Person Detection System — single-file launcher.
+Crack Detection System — single-file launcher.
 
 Just run:
     python run.py
@@ -111,9 +111,9 @@ def main() -> None:
     ensure_model()
 
     status("Loading detection model...  ", end="")
-    # force-import so the model loads before we say "done"
-    from backend.detector import DetectionEngine
-    DetectionEngine()
+    # Import the app module — this initializes the engine and loads the model.
+    # uvicorn will reuse this cached module, so the model only loads once.
+    import backend.app  # noqa: F401
     print("done")
     print()
 

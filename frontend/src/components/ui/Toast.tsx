@@ -31,13 +31,14 @@ function ToastNotification({
   const startRef = useRef(Date.now());
 
   useEffect(() => {
+    let raf: number;
     const tick = () => {
       const elapsed = Date.now() - startRef.current;
       const pct = Math.max(0, 100 - (elapsed / AUTO_DISMISS_MS) * 100);
       setProgress(pct);
       if (pct > 0) raf = requestAnimationFrame(tick);
     };
-    let raf = requestAnimationFrame(tick);
+    raf = requestAnimationFrame(tick);
     const timer = setTimeout(() => onDismiss(toast.id), AUTO_DISMISS_MS);
     return () => {
       cancelAnimationFrame(raf);

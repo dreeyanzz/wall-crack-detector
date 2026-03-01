@@ -11,7 +11,7 @@ interface Props {
 }
 
 export default function ScreenshotGallery({ screenshotCount }: Props) {
-  const toast = useToast();
+  const { error: toastError, success: toastSuccess } = useToast();
   const [shots, setShots] = useState<Screenshot[]>([]);
   const [loading, setLoading] = useState(true);
   const [lightbox, setLightbox] = useState<number | null>(null);
@@ -21,12 +21,12 @@ export default function ScreenshotGallery({ screenshotCount }: Props) {
     try {
       setLoading(true);
       setShots(await fetchScreenshots());
-    } catch {
-      // ignore
+    } catch (e) {
+      toastError(e instanceof Error ? e.message : "Failed to load screenshots");
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [toastError]);
 
   useEffect(() => {
     load();
@@ -36,11 +36,11 @@ export default function ScreenshotGallery({ screenshotCount }: Props) {
     try {
       await deleteScreenshot(name);
       setShots((prev) => prev.filter((s) => s.name !== name));
-      toast.success("Screenshot deleted");
+      toastSuccess("Screenshot deleted");
       setDeleting(null);
       if (lightbox !== null) setLightbox(null);
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Failed to delete");
+      toastError(e instanceof Error ? e.message : "Failed to delete");
     }
   };
 

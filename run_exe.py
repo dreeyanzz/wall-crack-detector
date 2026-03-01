@@ -17,7 +17,7 @@ def status(msg: str, end: str = "\n") -> None:
 def main() -> None:
     print()
     print("  ======================================")
-    print("    Person Detection System v2.0")
+    print("    Crack Detection System v2.0")
     print("  ======================================")
     print()
 

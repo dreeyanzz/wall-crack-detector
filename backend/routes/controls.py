@@ -1,4 +1,4 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
 
 from backend.detector import DetectionEngine
 
@@ -8,7 +8,10 @@ router = APIRouter()
 def create_router(engine: DetectionEngine) -> APIRouter:
     @router.post("/start")
     def start():
-        return engine.start()
+        result = engine.start()
+        if result.get("status") == "error":
+            raise HTTPException(status_code=409, detail=result["message"])
+        return result
 
     @router.post("/pause")
     def pause():

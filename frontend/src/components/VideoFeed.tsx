@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { streamUrl } from "../api";
 import Spinner from "./ui/Spinner";
+import { ICON_PATHS } from "./ui/icons";
 
 type FeedState = "idle" | "connecting" | "streaming" | "error";
 
@@ -53,7 +54,7 @@ export default function VideoFeed({ running, paused, streamKey }: Props) {
       {actualState === "idle" && (
         <div className="flex flex-col items-center gap-4 text-gray-600 select-none motion-safe:animate-fade-in">
           <svg className="w-16 h-16" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+            <path strokeLinecap="round" strokeLinejoin="round" d={ICON_PATHS.videoCameraOutline} />
           </svg>
           <p className="text-lg">Press <span className="text-accent font-semibold">Start</span> to begin detection</p>
         </div>

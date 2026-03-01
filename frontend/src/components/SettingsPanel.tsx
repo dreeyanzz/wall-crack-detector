@@ -101,7 +101,7 @@ export default function SettingsPanel({ settings, onUpdate }: Props) {
 
       {/* Camera mode */}
       <div>
-        <span className="text-xs text-gray-400 block mb-1">Camera</span>
+        <span className="text-sm text-gray-300 block mb-1">Camera</span>
         <div className="flex gap-2 mb-2">
           {[
             { label: "Built-in", ip: false },
