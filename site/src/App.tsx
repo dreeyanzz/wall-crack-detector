@@ -38,7 +38,7 @@ function App() {
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
               <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-500"></span>
             </span>
-            v1.0 is now available for macOS
+            v2.0 is now available for Windows
           </div>
           
           <h1 className="text-5xl md:text-7xl font-bold tracking-tight mb-6 max-w-4xl mx-auto leading-tight">
@@ -52,12 +52,12 @@ function App() {
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <a 
-              href="https://github.com/dreeyanzz/wall-crack-detector/releases/latest/download/CrackDetector-macOS.zip" // Assuming standard GitHub action artifact logic
+            <a
+              href="https://github.com/dreeyanzz/wall-crack-detector/releases/latest/download/CrackDetector.zip"
               className="group flex items-center gap-3 px-8 py-4 bg-primary hover:bg-primary-hover text-white rounded-full font-medium transition-all hover:scale-105 shadow-[0_0_30px_rgba(59,130,246,0.5)]"
             >
               <Download className="w-5 h-5 group-hover:-translate-y-0.5 transition-transform" />
-              Download for macOS
+              Download for Windows
             </a>
             <a 
               href="https://github.com/dreeyanzz/wall-crack-detector"
@@ -70,7 +70,7 @@ function App() {
             </a>
           </div>
           <p className="mt-6 text-sm text-zinc-500">
-            For Apple Silicon (M1/M2/M3) & Intel Macs · Requires macOS 12+
+            For Windows 10 / 11 (64-bit) · No installation required
           </p>
         </div>
       </main>
@@ -92,7 +92,7 @@ function App() {
             <FeatureCard 
               icon={<CheckCircle2 className="w-6 h-6 text-emerald-400" />}
               title="Standalone Executable"
-              desc="No complex Python environments to setup. We bundle everything into a single reliable macOS executable."
+              desc="No complex Python environments to setup. We bundle everything into a single reliable Windows executable."
             />
           </div>
         </div>
