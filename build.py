@@ -44,9 +44,9 @@ def main() -> None:
     if not DIST.is_dir():
         step("Building frontend...  ", end="")
         if not (FRONTEND / "node_modules").is_dir():
-            subprocess.check_call(["npm", "install"], cwd=str(FRONTEND), shell=True,
+            subprocess.check_call("npm install", cwd=str(FRONTEND), shell=True,
                                   stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-        subprocess.check_call(["npm", "run", "build"], cwd=str(FRONTEND), shell=True,
+        subprocess.check_call("npm run build", cwd=str(FRONTEND), shell=True,
                               stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         print("done")
 
