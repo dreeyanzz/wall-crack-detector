@@ -57,12 +57,21 @@ Camera -> OpenCV VideoCapture -> YOLOv8 model.predict()
 - Path resolution uses `sys.frozen` / `sys._MEIPASS` to find bundled data files.
 - `_base_dir()` returns read-only bundle root; `_writable_dir()` returns the exe's directory for screenshots.
 
+### Camera Input
+
+Two modes, switchable in the Settings panel:
+
+- **Built-in** — uses `cv2.VideoCapture(index)`. On Windows, tries DirectShow first, falls back to default backend.
+- **IP Camera** — pass any HTTP MJPEG URL (e.g. `http://192.168.1.42:8080/video`). OpenCV reads it natively; no extra dependencies. Recommended Android app: **IP Webcam** by Pavel Khlebovich (free, Play Store).
+
+`_camera_url = ""` means built-in. Any non-empty string is treated as an IP stream URL.
+
 ### Key Defaults
 
 - Confidence threshold: 0.45 (adjustable via UI, range 0.1-0.95)
-- Camera index: 0 (selectable in UI)
+- Camera: built-in index 0 (switchable to IP Camera URL in UI)
 - JPEG quality: 80
-- Camera resolution: 1280x720
+- Camera resolution: 1280x720 (set via cap.set; no-op on IP streams)
 - Server: 127.0.0.1:8000
 - Color scheme: dark theme (gray-950) with `#00d4ff` cyan accent
 
