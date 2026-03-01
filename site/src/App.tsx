@@ -54,8 +54,8 @@ function App() {
           </div>
 
           <h1 className="text-5xl md:text-7xl font-bold tracking-tight mb-6 max-w-4xl mx-auto leading-tight text-white">
-            AI-Powered Infrastructure <br className="hidden md:block" />
-            <span className="text-gradient">Inspection Toolkit</span>
+            Real-Time Crack Detection, <br className="hidden md:block" />
+            <span className="text-gradient">Straight from Your Camera</span>
           </h1>
 
           <p className="text-lg md:text-xl text-white/50 max-w-2xl mx-auto mb-10 leading-relaxed">
