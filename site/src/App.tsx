@@ -24,7 +24,7 @@ function App() {
             <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-violet-600 flex items-center justify-center shadow-lg">
               <Zap className="w-4 h-4 text-white" />
             </div>
-            <span className="font-semibold text-lg tracking-tight text-white">CrackDetector</span>
+            <span className="font-semibold text-lg tracking-tight text-white">Crack Detector</span>
           </div>
           <div className="hidden sm:flex text-sm text-white/60 gap-6">
             <a href="#features" className="hover:text-white transition-colors">Features</a>
@@ -66,7 +66,7 @@ function App() {
           {/* CTA buttons */}
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <a
-              href="https://github.com/dreeyanzz/wall-crack-detector/releases/latest/download/CrackDetector.zip"
+              href="https://github.com/dreeyanzz/wall-crack-detector/releases/latest/download/Crack Detector.zip"
               className="group flex items-center gap-3 px-8 py-4 rounded-2xl font-semibold text-white transition-all hover:scale-105
                          bg-gradient-to-r from-blue-600 to-violet-600 hover:from-blue-500 hover:to-violet-500
                          shadow-[0_0_40px_rgba(99,102,241,0.45)] hover:shadow-[0_0_60px_rgba(99,102,241,0.6)]"
@@ -94,7 +94,7 @@ function App() {
       {/* Features */}
       <section id="features" className="relative z-10 py-24 px-6">
         <div className="max-w-5xl mx-auto">
-          <h2 className="text-3xl font-bold text-center text-white mb-3">Why CrackDetector?</h2>
+          <h2 className="text-3xl font-bold text-center text-white mb-3">Why Crack Detector?</h2>
           <p className="text-center text-white/40 mb-12 text-sm">Everything you need, nothing you don't.</p>
           <div className="grid md:grid-cols-3 gap-6">
             <FeatureCard
@@ -120,7 +120,7 @@ function App() {
       <footer className="relative z-10 py-8 text-center">
         <div className="glass mx-6 rounded-2xl py-5 max-w-5xl md:mx-auto">
           <p className="text-white/30 text-sm">
-            &copy; {new Date().getFullYear()} CrackDetector · Open Source · Built with React & YOLOv8
+            &copy; {new Date().getFullYear()} Crack Detector · Open Source · Built with React & YOLOv8
           </p>
           <p className="text-white/20 text-xs mt-1">Made by dreeyanzz</p>
         </div>
