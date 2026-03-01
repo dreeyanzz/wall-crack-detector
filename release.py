@@ -33,11 +33,13 @@ def main() -> None:
         print(f"\n  Error: {ZIP_PATH} not found after build.\n")
         sys.exit(1)
 
-    # 2. Release
-    print(f"\n  Creating release {args.version}...\n")
+    # 2. Release to the public releases repo
+    RELEASES_REPO = "dreeyanzz/wall-crack-detector-releases"
+    print(f"\n  Creating release {args.version} on {RELEASES_REPO}...\n")
     cmd = [
         "gh", "release", "create", args.version,
         str(ZIP_PATH),
+        "--repo", RELEASES_REPO,
         "--title", args.version,
         "--notes", args.notes or f"Release {args.version}",
     ]
@@ -48,6 +50,7 @@ def main() -> None:
         sys.exit(1)
 
     print(f"\n  Done! Released {args.version}\n")
+    print(f"  https://github.com/{RELEASES_REPO}/releases/tag/{args.version}\n")
 
 
 if __name__ == "__main__":

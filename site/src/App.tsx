@@ -66,7 +66,7 @@ function App() {
           {/* CTA buttons */}
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <a
-              href="https://github.com/dreeyanzz/wall-crack-detector/releases/latest/download/Crack Detector.zip"
+              href="https://github.com/dreeyanzz/wall-crack-detector-releases/releases/latest/download/CrackDetector.zip"
               className="group flex items-center gap-3 px-8 py-4 rounded-2xl font-semibold text-white transition-all hover:scale-105
                          bg-gradient-to-r from-blue-600 to-violet-600 hover:from-blue-500 hover:to-violet-500
                          shadow-[0_0_40px_rgba(99,102,241,0.45)] hover:shadow-[0_0_60px_rgba(99,102,241,0.6)]"
