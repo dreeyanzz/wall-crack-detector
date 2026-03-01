@@ -5,11 +5,10 @@ import { fetchSettings, updateSettings as apiUpdate } from "../api";
 const DEFAULT_SETTINGS: Settings = {
   confidence: 0.45,
   camera_index: 0,
-  model_name: "yolov8n.pt",
+  camera_url: "",
+  model_name: "crack_n.pt",
   show_labels: true,
   show_confidence: true,
-  face_recognition_enabled: false,
-  face_recognition_tolerance: 0.6,
 };
 
 export function useSettings() {

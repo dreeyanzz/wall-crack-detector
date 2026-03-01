@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import type { Settings } from "../types";
 import ToggleSwitch from "./ui/ToggleSwitch";
 import Tooltip from "./ui/Tooltip";
@@ -13,12 +13,20 @@ interface Props {
 export default function SettingsPanel({ settings, onUpdate }: Props) {
   const toast = useToast();
   const [modelLoading, setModelLoading] = useState(false);
+  const [isIpMode, setIsIpMode] = useState(settings.camera_url !== "");
+  const [localUrl, setLocalUrl] = useState(settings.camera_url);
+
+  // Sync local state when settings arrive from server
+  useEffect(() => {
+    setIsIpMode(settings.camera_url !== "");
+    setLocalUrl(settings.camera_url);
+  }, [settings.camera_url]);
 
   const handleModelChange = async (model: string) => {
     setModelLoading(true);
     try {
       onUpdate({ model_name: model });
-      toast.info(`Switching to ${model === "yolov8n.pt" ? "fast" : "accurate"} model...`);
+      toast.info(`Switching to ${model === "crack_n.pt" ? "fast" : "accurate"} model...`);
     } finally {
       setTimeout(() => setModelLoading(false), 2000);
     }
@@ -58,8 +66,8 @@ export default function SettingsPanel({ settings, onUpdate }: Props) {
         </span>
         <div className="flex gap-2">
           {[
-            { label: "Fast", value: "yolov8n.pt" },
-            { label: "Accurate", value: "yolov8m.pt" },
+            { label: "nano (fast)", value: "crack_n.pt" },
+            { label: "medium (accurate)", value: "crack_m.pt" },
           ].map((m) => (
             <button
               key={m.value}
@@ -80,7 +88,7 @@ export default function SettingsPanel({ settings, onUpdate }: Props) {
       {/* Display toggles */}
       <div>
         <ToggleSwitch
-          label="Show ID Labels"
+          label="Show Labels"
           checked={settings.show_labels}
           onChange={(v) => onUpdate({ show_labels: v })}
         />
@@ -91,48 +99,64 @@ export default function SettingsPanel({ settings, onUpdate }: Props) {
         />
       </div>
 
-      {/* Face Recognition */}
-      <div>
-        <ToggleSwitch
-          label="Face Recognition"
-          checked={settings.face_recognition_enabled}
-          onChange={(v) => onUpdate({ face_recognition_enabled: v })}
-        />
-        {settings.face_recognition_enabled && (
-          <div className="mt-2 motion-safe:animate-fade-up">
-            <div className="flex justify-between text-xs mb-1">
-              <span className="text-gray-400">Tolerance</span>
-              <span className="text-accent font-mono">{settings.face_recognition_tolerance.toFixed(2)}</span>
-            </div>
-            <input
-              type="range"
-              min={0.3}
-              max={0.8}
-              step={0.05}
-              value={settings.face_recognition_tolerance}
-              onChange={(e) => onUpdate({ face_recognition_tolerance: parseFloat(e.target.value) })}
-              className="w-full"
-            />
-            <div className="flex justify-between text-[10px] text-gray-600 mt-0.5">
-              <span>Strict</span>
-              <span>Lenient</span>
-            </div>
-          </div>
-        )}
-      </div>
-
-      {/* Camera index */}
+      {/* Camera mode */}
       <div>
         <span className="text-xs text-gray-400 block mb-1">Camera</span>
-        <select
-          value={settings.camera_index}
-          onChange={(e) => onUpdate({ camera_index: parseInt(e.target.value) })}
-          className="bg-gray-800 border border-gray-700 rounded-lg px-3 py-1.5 text-sm text-gray-300 w-full focus:outline-none focus:border-accent/50 transition-colors"
-        >
-          <option value={0}>Camera 0</option>
-          <option value={1}>Camera 1</option>
-          <option value={2}>Camera 2</option>
-        </select>
+        <div className="flex gap-2 mb-2">
+          {[
+            { label: "Built-in", ip: false },
+            { label: "IP Camera", ip: true },
+          ].map((m) => (
+            <button
+              key={String(m.ip)}
+              onClick={() => {
+                setIsIpMode(m.ip);
+                if (!m.ip) onUpdate({ camera_url: "" });
+              }}
+              className={`flex-1 text-xs py-1.5 rounded-lg border transition-colors ${
+                isIpMode === m.ip
+                  ? "border-accent/40 bg-accent/10 text-accent"
+                  : "border-gray-700 text-gray-400 hover:border-gray-600"
+              }`}
+            >
+              {m.label}
+            </button>
+          ))}
+        </div>
+
+        {!isIpMode ? (
+          <select
+            value={settings.camera_index}
+            onChange={(e) => onUpdate({ camera_index: parseInt(e.target.value) })}
+            className="bg-gray-800 border border-gray-700 rounded-lg px-3 py-1.5 text-sm text-gray-300 w-full focus:outline-none focus:border-accent/50 transition-colors"
+          >
+            <option value={0}>Camera 0</option>
+            <option value={1}>Camera 1</option>
+            <option value={2}>Camera 2</option>
+          </select>
+        ) : (
+          <div className="space-y-1.5">
+            <div className="flex gap-2">
+              <input
+                type="text"
+                value={localUrl}
+                onChange={(e) => setLocalUrl(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") onUpdate({ camera_url: localUrl });
+                }}
+                placeholder="http://192.168.x.x:8080/video"
+                className="flex-1 bg-gray-800 border border-gray-700 rounded-lg px-3 py-1.5 text-xs text-gray-300 focus:outline-none focus:border-accent/50 transition-colors"
+              />
+              <button
+                onClick={() => onUpdate({ camera_url: localUrl })}
+                className="px-3 py-1.5 text-xs rounded-lg border border-accent/40 bg-accent/10 text-accent hover:bg-accent/20 transition-colors"
+              >
+                Set
+              </button>
+            </div>
+            <p className="text-xs text-gray-500">Install IP Webcam on Android</p>
+          </div>
+        )}
       </div>
     </div>
   );

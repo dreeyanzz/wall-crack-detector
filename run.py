@@ -49,7 +49,15 @@ def install_and_build_frontend() -> None:
                               stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         print("done")
 
-    if not DIST.is_dir():
+    needs_build = not DIST.is_dir()
+    if not needs_build:
+        src_files = list((FRONTEND / "src").rglob("*"))
+        if src_files:
+            newest_src = max(f.stat().st_mtime for f in src_files if f.is_file())
+            dist_mtime = DIST.stat().st_mtime
+            needs_build = newest_src > dist_mtime
+
+    if needs_build:
         status("Building frontend...  ", end="")
         subprocess.check_call(["npm", "run", "build"], cwd=str(FRONTEND), shell=True,
                               stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
@@ -57,12 +65,12 @@ def install_and_build_frontend() -> None:
 
 
 def ensure_model() -> None:
-    model = ROOT / "yolov8n.pt"
+    model = ROOT / "crack_n.pt"
     if not model.exists():
-        status("Downloading detection model (~6 MB)...  ", end="")
-        from ultralytics import YOLO
-        YOLO("yolov8n.pt")
-        print("done")
+        status("crack_n.pt not found. Download it with huggingface_hub:")
+        status("  pip install huggingface_hub")
+        status("  python -c \"from huggingface_hub import hf_hub_download; import shutil; shutil.copy(hf_hub_download('OpenSistemas/YOLOv8-crack-seg', 'yolov8n/weights/best.pt'), 'crack_n.pt')\"")
+        sys.exit(1)
 
 
 def start_server() -> None:
@@ -94,7 +102,7 @@ def start_server() -> None:
 def main() -> None:
     print()
     print("  ======================================")
-    print("    Person Detection System v2.0")
+    print("    Crack Detection System")
     print("  ======================================")
     print()
 

@@ -1,24 +1,21 @@
 """
-DetectionEngine — thread-safe YOLOv8 person detection with MJPEG output.
+DetectionEngine — thread-safe YOLOv8 crack detection with MJPEG output.
 
-Extracted from the original gui_detector.py tkinter application.
-Designed to be driven by FastAPI route handlers.
+Uses a YOLOv8 segmentation model (crack_n.pt / crack_m.pt) to detect and
+draw crack instance masks in real time.
 """
 
 import sys
 import cv2
 import threading
 import time
-from concurrent.futures import ThreadPoolExecutor, ProcessPoolExecutor
-from concurrent.futures.process import BrokenProcessPool
+import numpy as np
 from datetime import datetime
 from pathlib import Path
 
 from ultralytics import YOLO
 
-from backend.face_db import FaceDatabase, _recognize_worker
-
-# Colors assigned to tracking IDs
+# Colors assigned to crack instances
 _COLORS = [
     (0, 255, 100), (255, 100, 0), (0, 100, 255),
     (255, 0, 150), (0, 255, 255), (255, 255, 0),
@@ -47,7 +44,7 @@ MODEL_DIR = _base_dir()
 
 
 class DetectionEngine:
-    """Thread-safe person detection engine backed by YOLOv8 + ByteTrack."""
+    """Thread-safe crack detection engine backed by YOLOv8 instance segmentation."""
 
     def __init__(self) -> None:
         # --- lock protects all mutable state below ---
@@ -60,9 +57,7 @@ class DetectionEngine:
         self._thread: threading.Thread | None = None
 
         # stats
-        self._people_count = 0
-        self._total_unique = 0
-        self._all_seen_ids: set[int] = set()
+        self._crack_count = 0
         self._fps = 0.0
         self._session_start: float | None = None
         self._screenshot_count = 0
@@ -70,7 +65,8 @@ class DetectionEngine:
         # settings
         self._confidence = 0.45
         self._camera_index = 0
-        self._model_name = "yolov8n.pt"
+        self._camera_url = ""
+        self._model_name = "crack_n.pt"
         self._show_labels = True
         self._show_confidence = True
 
@@ -80,22 +76,6 @@ class DetectionEngine:
 
         # raw BGR frame for screenshots
         self._raw_frame = None
-
-        # face recognition
-        self._face_db = FaceDatabase(_writable_dir() / "faces")
-        self._face_recognition_enabled = False
-        self._face_recognition_tolerance = 0.6
-        self._face_cache: dict[int, str | None] = {}
-        self._face_in_flight: set[int] = set()           # track IDs with pending bg jobs
-        self._face_attempts: dict[int, int] = {}          # track ID -> attempt count
-        self._face_last_attempt: dict[int, float] = {}    # track ID -> timestamp
-        self._face_thread_pool = ThreadPoolExecutor(max_workers=2, thread_name_prefix="face")
-        self._face_proc_pool: ProcessPoolExecutor | None = None
-        self._face_proc_crashes = 0
-        _FACE_RETRY_INTERVAL = 1.0   # seconds between retries
-        _FACE_MAX_RETRIES = 10
-        self._face_retry_interval = _FACE_RETRY_INTERVAL
-        self._face_max_retries = _FACE_MAX_RETRIES
 
         # model (loaded once, reloaded on model change)
         self._model: YOLO | None = None
@@ -118,9 +98,17 @@ class DetectionEngine:
             if self._running:
                 return {"status": "already_running"}
 
-            cap = cv2.VideoCapture(self._camera_index)
+            if self._camera_url:
+                cap = cv2.VideoCapture(self._camera_url)
+            else:
+                # On Windows prefer DirectShow — MSMF often fails to read frames
+                backend = cv2.CAP_DSHOW if sys.platform == "win32" else cv2.CAP_ANY
+                cap = cv2.VideoCapture(self._camera_index, backend)
+                if not cap.isOpened():
+                    # Fallback to default backend
+                    cap = cv2.VideoCapture(self._camera_index)
             if not cap.isOpened():
-                return {"status": "error", "message": f"Cannot open camera {self._camera_index}"}
+                return {"status": "error", "message": "Cannot open camera"}
 
             cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
             cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
@@ -128,17 +116,11 @@ class DetectionEngine:
             self._cap = cap
             self._running = True
             self._paused = False
-            self._all_seen_ids.clear()
-            self._total_unique = 0
-            self._people_count = 0
+            self._crack_count = 0
             self._screenshot_count = 0
             self._fps = 0.0
             self._session_start = time.time()
             self._jpeg_frame = None
-            self._face_cache = {}
-            self._face_in_flight = set()
-            self._face_attempts = {}
-            self._face_last_attempt = {}
 
         # start detection in a daemon thread
         self._thread = threading.Thread(target=self._detection_loop, daemon=True)
@@ -164,15 +146,10 @@ class DetectionEngine:
             summary = {
                 "status": "stopped",
                 "duration": self._format_time(time.time() - self._session_start) if self._session_start else "00:00:00",
-                "total_unique": self._total_unique,
                 "screenshots": self._screenshot_count,
             }
             self._session_start = None
             self._jpeg_frame = None
-            self._face_cache = {}
-            self._face_in_flight = set()
-            self._face_attempts = {}
-            self._face_last_attempt = {}
             # signal any waiting generator
             self._frame_event.set()
             return summary
@@ -194,8 +171,7 @@ class DetectionEngine:
             if self._session_start and self._running:
                 elapsed = self._format_time(time.time() - self._session_start)
             return {
-                "people_count": self._people_count,
-                "total_unique": self._total_unique,
+                "crack_count": self._crack_count,
                 "fps": round(self._fps, 1),
                 "session_time": elapsed,
                 "screenshots": self._screenshot_count,
@@ -208,11 +184,10 @@ class DetectionEngine:
             return {
                 "confidence": self._confidence,
                 "camera_index": self._camera_index,
+                "camera_url": self._camera_url,
                 "model_name": self._model_name,
                 "show_labels": self._show_labels,
                 "show_confidence": self._show_confidence,
-                "face_recognition_enabled": self._face_recognition_enabled,
-                "face_recognition_tolerance": self._face_recognition_tolerance,
             }
 
     def update_settings(self, data: dict) -> dict:
@@ -222,6 +197,8 @@ class DetectionEngine:
                 self._confidence = max(0.1, min(0.95, float(data["confidence"])))
             if "camera_index" in data:
                 self._camera_index = int(data["camera_index"])
+            if "camera_url" in data:
+                self._camera_url = str(data["camera_url"]).strip()
             if "show_labels" in data:
                 self._show_labels = bool(data["show_labels"])
             if "show_confidence" in data:
@@ -231,10 +208,6 @@ class DetectionEngine:
                 if new_model != self._model_name:
                     self._model_name = new_model
                     reload_model = True
-            if "face_recognition_enabled" in data:
-                self._face_recognition_enabled = bool(data["face_recognition_enabled"])
-            if "face_recognition_tolerance" in data:
-                self._face_recognition_tolerance = max(0.3, min(0.8, float(data["face_recognition_tolerance"])))
 
         if reload_model:
             self._load_model()
@@ -264,52 +237,6 @@ class DetectionEngine:
     def list_screenshots(self) -> list[dict]:
         files = sorted(SCREENSHOT_DIR.glob("*.jpg"), reverse=True)
         return [{"name": f.name, "size": f.stat().st_size} for f in files]
-
-    # ------------------------------------------------------------------
-    # Face recognition
-    # ------------------------------------------------------------------
-
-    def gpu_info(self) -> dict:
-        from backend.face_db import HAS_GPU
-        import torch
-        pytorch_cuda = torch.cuda.is_available()
-        return {
-            "has_gpu": HAS_GPU or pytorch_cuda,
-            "pytorch_cuda": pytorch_cuda,
-            "dlib_cuda": HAS_GPU,
-        }
-
-    def _invalidate_face_cache(self) -> None:
-        """Clear all cached recognition results, forcing re-evaluation."""
-        with self._lock:
-            self._face_cache.clear()
-            self._face_in_flight.clear()
-            self._face_attempts.clear()
-            self._face_last_attempt.clear()
-
-    def enroll_face_from_image(self, name: str, bgr_image, cpu_only: bool = False) -> dict:
-        result = self._face_db.enroll_from_image(name, bgr_image, cpu_only=cpu_only)
-        if result.get("status") == "ok":
-            self._invalidate_face_cache()
-        return result
-
-    def list_faces(self) -> list[dict]:
-        return self._face_db.list_people()
-
-    def delete_face(self, name: str) -> dict:
-        result = self._face_db.delete_person(name)
-        if result.get("status") == "ok":
-            self._invalidate_face_cache()
-        return result
-
-    def export_face_db(self) -> bytes:
-        return self._face_db.export_bytes()
-
-    def import_face_db(self, data: bytes, merge: bool) -> dict:
-        result = self._face_db.import_bytes(data, merge)
-        if result.get("status") == "ok":
-            self._invalidate_face_cache()
-        return result
 
     # ------------------------------------------------------------------
     # MJPEG streaming
@@ -350,8 +277,6 @@ class DetectionEngine:
                     conf = self._confidence
                     show_labels = self._show_labels
                     show_conf = self._show_confidence
-                    face_enabled = self._face_recognition_enabled
-                    face_tolerance = self._face_recognition_tolerance
 
                 if cap is None:
                     break
@@ -362,62 +287,25 @@ class DetectionEngine:
                         self._running = False
                     break
 
-                # Run YOLO detection (expensive — lock NOT held)
-                results = self._model.track(
-                    frame,
-                    persist=True,
-                    tracker="bytetrack.yaml",
-                    conf=conf,
-                    classes=[0],
-                    verbose=False,
+                # Run YOLO segmentation (expensive — lock NOT held)
+                results = self._model.predict(
+                    frame, conf=conf, verbose=False
                 )
 
-                people_count = 0
-                seen_ids: set[int] = set()
-
-                if results[0].boxes is not None and len(results[0].boxes):
-                    for box in results[0].boxes:
-                        x1, y1, x2, y2 = map(int, box.xyxy[0].tolist())
-                        confidence = float(box.conf[0])
-                        track_id = int(box.id[0]) if box.id is not None else -1
-
-                        if track_id >= 0:
-                            seen_ids.add(track_id)
-
-                        # Face recognition (async, cached per track_id)
-                        recognized_name = None
-                        if face_enabled and track_id >= 0:
-                            try:
-                                if self._face_cache.get(track_id):
-                                    recognized_name = self._face_cache[track_id]
-                                else:
-                                    now_t = time.time()
-                                    in_flight = track_id in self._face_in_flight
-                                    attempts = self._face_attempts.get(track_id, 0)
-                                    last_attempt = self._face_last_attempt.get(track_id, 0.0)
-                                    cooldown_ok = (now_t - last_attempt) >= self._face_retry_interval
-
-                                    if not in_flight and attempts < self._face_max_retries and cooldown_ok:
-                                        # Crop and submit to background thread
-                                        h, w = frame.shape[:2]
-                                        cx1 = max(0, x1)
-                                        cy1 = max(0, y1)
-                                        cx2 = min(w, x2)
-                                        cy2 = min(h, y2)
-                                        if cx2 > cx1 and cy2 > cy1:
-                                            crop = frame[cy1:cy2, cx1:cx2].copy()
-                                            self._face_in_flight.add(track_id)
-                                            self._face_attempts[track_id] = attempts + 1
-                                            self._face_last_attempt[track_id] = now_t
-                                            self._face_thread_pool.submit(
-                                                self._recognize_async, track_id, crop, face_tolerance
-                                            )
-                            except Exception as e:
-                                print(f"[face-rec] error submitting job for track {track_id}: {e}")
-
-                        people_count += 1
-                        color = _COLORS[track_id % len(_COLORS)]
-                        self._draw_detection(frame, x1, y1, x2, y2, color, track_id, confidence, show_labels, show_conf, recognized_name)
+                crack_count = 0
+                if results[0].masks is not None:
+                    overlay = frame.copy()
+                    for i, (mask_pts, box) in enumerate(zip(results[0].masks.xy, results[0].boxes)):
+                        pts = np.array(mask_pts, dtype=np.int32)
+                        conf_val = float(box.conf[0])
+                        color = _COLORS[i % len(_COLORS)]
+                        cv2.fillPoly(overlay, [pts], color=color)
+                        cv2.polylines(frame, [pts], isClosed=True, color=color, thickness=2)
+                        if show_labels or show_conf:
+                            x1, y1 = int(box.xyxy[0][0]), int(box.xyxy[0][1])
+                            self._draw_label(frame, x1, y1, conf_val, show_labels, show_conf, color)
+                        crack_count += 1
+                    cv2.addWeighted(overlay, 0.25, frame, 0.75, 0, frame)
 
                 # Encode frame to JPEG
                 _, jpeg_buf = cv2.imencode(".jpg", frame, [cv2.IMWRITE_JPEG_QUALITY, 80])
@@ -431,9 +319,7 @@ class DetectionEngine:
 
                 # Write shared state under lock
                 with self._lock:
-                    self._people_count = people_count
-                    self._all_seen_ids.update(seen_ids)
-                    self._total_unique = len(self._all_seen_ids)
+                    self._crack_count = crack_count
                     self._fps = self._fps * 0.8 + fps * 0.2
                     self._raw_frame = frame
                     self._jpeg_frame = jpeg_bytes
@@ -453,84 +339,25 @@ class DetectionEngine:
                 time.sleep(0.1)
 
     # ------------------------------------------------------------------
-    # Async face recognition
-    # ------------------------------------------------------------------
-
-    def _get_face_proc_pool(self) -> ProcessPoolExecutor | None:
-        """Return the face recognition process pool, creating it lazily.
-
-        Returns None if face recognition has crashed too many times (>=3).
-        """
-        if self._face_proc_crashes >= 3:
-            return None
-        if self._face_proc_pool is None:
-            self._face_proc_pool = ProcessPoolExecutor(max_workers=1)
-        return self._face_proc_pool
-
-    def _recognize_async(self, track_id: int, crop, tolerance: float) -> None:
-        """Run face recognition in a separate process and update the cache."""
-        try:
-            pool = self._get_face_proc_pool()
-            if pool is None:
-                return
-
-            encodings = self._face_db.get_encodings_snapshot()
-            if not encodings:
-                return
-
-            future = pool.submit(_recognize_worker, crop, tolerance, encodings)
-            name = future.result(timeout=30)
-            if name:
-                with self._lock:
-                    self._face_cache[track_id] = name
-            # Reset crash counter on success
-            self._face_proc_crashes = 0
-        except BrokenProcessPool:
-            self._face_proc_crashes += 1
-            self._face_proc_pool = None
-            print(f"[face-rec] worker process crashed (attempt {self._face_proc_crashes}/3)", flush=True)
-            if self._face_proc_crashes >= 3:
-                print("[face-rec] face recognition disabled — dlib keeps crashing", flush=True)
-                print("[face-rec] this usually means dlib is incompatible with your Python version", flush=True)
-        except Exception as e:
-            print(f"[face-rec] error for track {track_id}: {e}", flush=True)
-        finally:
-            with self._lock:
-                self._face_in_flight.discard(track_id)
-
-    # ------------------------------------------------------------------
     # Drawing helpers
     # ------------------------------------------------------------------
 
     @staticmethod
-    def _draw_detection(frame, x1, y1, x2, y2, color, track_id, confidence, show_labels, show_conf, recognized_name=None):
-        cv2.rectangle(frame, (x1, y1), (x2, y2), color, 2)
+    def _draw_label(frame, x1, y1, confidence, show_labels, show_conf, color):
+        parts = []
+        if show_labels:
+            parts.append("crack")
+        if show_conf:
+            parts.append(f"{confidence * 100:.1f}%")
+        if not parts:
+            return
+        label = " | ".join(parts)
 
-        # corner accents
-        cl = 20
-        for (cx, cy), (hx, hy), (vx, vy) in [
-            ((x1, y1), (x1 + cl, y1), (x1, y1 + cl)),
-            ((x2, y1), (x2 - cl, y1), (x2, y1 + cl)),
-            ((x1, y2), (x1 + cl, y2), (x1, y2 - cl)),
-            ((x2, y2), (x2 - cl, y2), (x2, y2 - cl)),
-        ]:
-            cv2.line(frame, (cx, cy), (hx, hy), color, 3)
-            cv2.line(frame, (cx, cy), (vx, vy), color, 3)
-
-        # label
-        if show_labels or show_conf:
-            parts = []
-            if show_labels:
-                parts.append(recognized_name if recognized_name else f"ID #{track_id}")
-            if show_conf:
-                parts.append(f"{confidence * 100:.1f}%")
-            label = " | ".join(parts)
-
-            font = cv2.FONT_HERSHEY_SIMPLEX
-            (tw, th), _ = cv2.getTextSize(label, font, 0.55, 1)
-            label_y = y1 - 10 if y1 - 10 > th else y2 + th + 10
-            cv2.rectangle(frame, (x1, label_y - th - 8), (x1 + tw + 14, label_y + 4), color, -1)
-            cv2.putText(frame, label, (x1 + 7, label_y - 4), font, 0.55, (0, 0, 0), 2, cv2.LINE_AA)
+        font = cv2.FONT_HERSHEY_SIMPLEX
+        (tw, th), _ = cv2.getTextSize(label, font, 0.55, 1)
+        label_y = y1 - 10 if y1 - 10 > th else y1 + th + 10
+        cv2.rectangle(frame, (x1, label_y - th - 8), (x1 + tw + 14, label_y + 4), color, -1)
+        cv2.putText(frame, label, (x1 + 7, label_y - 4), font, 0.55, (0, 0, 0), 2, cv2.LINE_AA)
 
     @staticmethod
     def _format_time(seconds: float) -> str:
