@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Download, CheckCircle2, Shield, Zap, Terminal } from 'lucide-react';
+import { Download, CheckCircle2, Shield, Zap } from 'lucide-react';
 
 function App() {
   const [mounted, setMounted] = useState(false);
@@ -73,15 +73,6 @@ function App() {
             >
               <Download className="w-5 h-5 group-hover:-translate-y-0.5 transition-transform" />
               Download for Windows
-            </a>
-            <a
-              href="https://github.com/dreeyanzz/wall-crack-detector"
-              target="_blank"
-              rel="noreferrer"
-              className="flex items-center gap-3 px-8 py-4 glass rounded-2xl font-medium text-white/80 hover:text-white hover:bg-white/10 transition-all"
-            >
-              <Terminal className="w-5 h-5" />
-              View Source
             </a>
           </div>
 
