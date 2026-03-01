@@ -1,12 +1,45 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
-body {
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
-  background-color: #030712;
-  color: #f9fafb;
-  margin: 0;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+@theme {
+  --color-background: #09090b;
+  --color-foreground: #fafafa;
+  --color-primary: #3b82f6;
+  --color-primary-hover: #2563eb;
+  --color-card: #18181b;
+  --color-card-border: #27272a;
+}
+
+@layer base {
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
+
+@layer utilities {
+  .glass {
+    background-color: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  }
+  
+  .text-gradient {
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+    background-image: linear-gradient(to right, #60a5fa, #818cf8);
+  }
+}
+
+/* Custom glowing effect for shapes */
+.glow-shape {
+  position: absolute;
+  filter: blur(80px);
+  z-index: -1;
+  border-radius: 50%;
+  pointer-events: none;
 }
