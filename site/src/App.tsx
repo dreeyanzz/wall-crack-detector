@@ -122,6 +122,7 @@ function App() {
           <p className="text-white/30 text-sm">
             &copy; {new Date().getFullYear()} CrackDetector · Open Source · Built with React & YOLOv8
           </p>
+          <p className="text-white/20 text-xs mt-1">Made by dreeyanzz</p>
         </div>
       </footer>
 
