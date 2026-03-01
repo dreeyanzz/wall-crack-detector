@@ -10,7 +10,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 
 from backend.detector import DetectionEngine
-from backend.routes import stream, controls, settings, stats, screenshots, faces
+from backend.routes import stream, controls, settings, stats, screenshots
 
 
 def _find_frontend_dist() -> Path:
@@ -23,10 +23,10 @@ def _find_frontend_dist() -> Path:
 # Single shared engine instance
 engine = DetectionEngine()
 
-app = FastAPI(title="Person Detection System")
+app = FastAPI(title="Crack Detection System")
 
 # Register API routes under /api
-for module in (stream, controls, settings, stats, screenshots, faces):
+for module in (stream, controls, settings, stats, screenshots):
     app.include_router(module.create_router(engine), prefix="/api")
 
 # Serve built React frontend (production)

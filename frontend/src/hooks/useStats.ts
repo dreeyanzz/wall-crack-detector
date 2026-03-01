@@ -3,8 +3,7 @@ import type { Stats } from "../types";
 import { fetchStats } from "../api";
 
 const DEFAULT_STATS: Stats = {
-  people_count: 0,
-  total_unique: 0,
+  crack_count: 0,
   fps: 0,
   session_time: "",
   screenshots: 0,

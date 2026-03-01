@@ -1,4 +1,4 @@
-import type { Stats, Settings, Screenshot, FacePerson } from "./types";
+import type { Stats, Settings, Screenshot } from "./types";
 
 const BASE = "/api";
 
@@ -45,61 +45,6 @@ export const takeScreenshot = () => json<{ status: string; filename?: string }>(
 export const fetchScreenshots = () => json<Screenshot[]>(fetch(`${BASE}/screenshots`));
 export const deleteScreenshot = (name: string) =>
   json<{ status: string }>(fetch(`${BASE}/screenshots/${encodeURIComponent(name)}`, { method: "DELETE" }));
-
-// Faces
-export interface EnrollResult {
-  status: string;
-  name?: string;
-  sample_count?: number;
-  message?: string;
-  gpu_failed?: boolean;
-  filename?: string;
-}
-export const fetchFaces = () => json<FacePerson[]>(fetch(`${BASE}/faces`));
-export interface GpuInfo {
-  has_gpu: boolean;
-  pytorch_cuda: boolean;
-  dlib_cuda: boolean;
-}
-export const fetchGpuInfo = () => json<GpuInfo>(fetch(`${BASE}/faces/gpu`));
-export const uploadFacePhoto = (name: string, file: File, cpuOnly = false) => {
-  const form = new FormData();
-  form.append("name", name);
-  form.append("files", file);
-  form.append("cpu_only", cpuOnly ? "true" : "false");
-  return json<EnrollResult>(
-    fetch(`${BASE}/faces/upload`, { method: "POST", body: form })
-  );
-};
-export const deleteFace = (name: string) =>
-  json<{ status: string }>(fetch(`${BASE}/faces/${encodeURIComponent(name)}`, { method: "DELETE" }));
-
-export async function exportFaceDb(): Promise<void> {
-  const res = await fetch(`${BASE}/faces/export`);
-  if (!res.ok) throw new ApiError(res.status, "Export failed");
-  const blob = await res.blob();
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = "face_db.pkl";
-  a.click();
-  URL.revokeObjectURL(url);
-}
-
-export interface ImportResult {
-  status: string;
-  imported_names?: string[];
-  total_people?: number;
-  message?: string;
-}
-export function importFaceDb(file: File, merge: boolean): Promise<ImportResult> {
-  const form = new FormData();
-  form.append("file", file);
-  form.append("merge", merge ? "true" : "false");
-  return json<ImportResult>(
-    fetch(`${BASE}/faces/import`, { method: "POST", body: form })
-  );
-}
 
 // Stream URL (not a fetch — used as <img> src)
 export const streamUrl = (cacheBust: number) => `${BASE}/stream?t=${cacheBust}`;

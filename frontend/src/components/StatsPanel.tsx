@@ -6,8 +6,7 @@ interface Props {
 }
 
 const STAT_ICONS = {
-  people: "M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z",
-  group: "M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z",
+  crack: "M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z",
   gauge: "M13 10V3L4 14h7v7l9-11h-7z",
   clock: "M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z",
 };
@@ -48,15 +47,16 @@ function StatCard({
 
 export default function StatsPanel({ stats }: Props) {
   return (
-    <div className="grid grid-cols-2 gap-2">
-      <StatCard
-        label="In Frame"
-        value={stats.people_count}
-        icon={STAT_ICONS.people}
-        highlight={stats.people_count > 0}
-      />
-      <StatCard label="Total Unique" value={stats.total_unique} icon={STAT_ICONS.group} />
-      <StatCard label="FPS" value={stats.fps} icon={STAT_ICONS.gauge} />
+    <div className="flex flex-col gap-2">
+      <div className="grid grid-cols-2 gap-2">
+        <StatCard
+          label="Cracks Detected"
+          value={stats.crack_count}
+          icon={STAT_ICONS.crack}
+          highlight={stats.crack_count > 0}
+        />
+        <StatCard label="FPS" value={stats.fps} icon={STAT_ICONS.gauge} />
+      </div>
       <StatCard label="Session" value={stats.session_time || "--:--"} icon={STAT_ICONS.clock} />
     </div>
   );

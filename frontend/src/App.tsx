@@ -5,7 +5,6 @@ import ControlBar from "./components/ControlBar";
 import StatsPanel from "./components/StatsPanel";
 import SettingsPanel from "./components/SettingsPanel";
 import ScreenshotGallery from "./components/ScreenshotGallery";
-import FacePanel from "./components/FacePanel";
 import CollapsiblePanel from "./components/ui/CollapsiblePanel";
 import { useStats } from "./hooks/useStats";
 import { useSettings } from "./hooks/useSettings";
@@ -40,13 +39,6 @@ export default function App() {
 
         <CollapsiblePanel title="Settings" defaultOpen storageKey="settings">
           <SettingsPanel settings={settings} onUpdate={update} />
-        </CollapsiblePanel>
-
-        <CollapsiblePanel
-          title="Face Recognition"
-          storageKey="faces"
-        >
-          <FacePanel />
         </CollapsiblePanel>
 
         <CollapsiblePanel

@@ -1,13 +1,13 @@
 """
-Build standalone PersonDetector.exe using PyInstaller.
+Build standalone CrackDetector.exe using PyInstaller.
 
 Usage:
     python build.py
 
 Output:
-    dist/PersonDetector/PersonDetector.exe   (+ supporting files)
+    dist/CrackDetector/CrackDetector.exe   (+ supporting files)
 
-The customer receives the dist/PersonDetector folder — just run the exe.
+The customer receives the dist/CrackDetector folder — just run the exe.
 """
 
 import shutil
@@ -27,7 +27,7 @@ def step(msg: str, end: str = "\n") -> None:
 def main() -> None:
     print()
     print("  ======================================")
-    print("    Building PersonDetector.exe")
+    print("    Building CrackDetector.exe")
     print("  ======================================")
     print()
 
@@ -51,12 +51,10 @@ def main() -> None:
         print("done")
 
     # 3. Ensure model exists
-    model_path = ROOT / "yolov8n.pt"
+    model_path = ROOT / "crack_n.pt"
     if not model_path.exists():
-        step("Downloading YOLOv8n model...  ", end="")
-        from ultralytics import YOLO
-        YOLO("yolov8n.pt")
-        print("done")
+        step("crack_n.pt not found — download it first with huggingface_hub")
+        sys.exit(1)
 
     # 4. Run PyInstaller
     step("Packaging with PyInstaller (this takes a few minutes)...")
@@ -66,7 +64,7 @@ def main() -> None:
 
     cmd = [
         sys.executable, "-m", "PyInstaller",
-        "--name", "PersonDetector",
+        "--name", "CrackDetector",
         "--noconfirm",
         "--console",
         # Bundle data files
@@ -93,16 +91,6 @@ def main() -> None:
         "--hidden-import", "backend.routes.settings",
         "--hidden-import", "backend.routes.stats",
         "--hidden-import", "backend.routes.screenshots",
-        "--hidden-import", "backend.routes.faces",
-        "--hidden-import", "backend.face_db",
-        "--hidden-import", "concurrent.futures",
-        "--hidden-import", "concurrent.futures.process",
-        "--hidden-import", "multiprocessing",
-        "--hidden-import", "multiprocessing.pool",
-        "--hidden-import", "multiprocessing.managers",
-        "--hidden-import", "face_recognition",
-        "--hidden-import", "face_recognition_models",
-        "--hidden-import", "dlib",
         "--hidden-import", "python_multipart",
         "--hidden-import", "multipart",
         "--hidden-import", "PIL",
@@ -113,7 +101,6 @@ def main() -> None:
         "--hidden-import", "pkg_resources",
         # Collect data files (models, configs)
         "--collect-data", "ultralytics",
-        "--collect-data", "face_recognition_models",
         # Entry point
         "run_exe.py",
     ]
@@ -121,19 +108,19 @@ def main() -> None:
     subprocess.check_call(cmd, cwd=str(ROOT))
 
     print()
-    output = ROOT / "dist" / "PersonDetector"
+    output = ROOT / "dist" / "CrackDetector"
 
     # 5. Create zip archive
     step("Creating zip archive...  ", end="")
-    zip_path = ROOT / "dist" / "PersonDetector"
-    shutil.make_archive(str(zip_path), "zip", root_dir=str(ROOT / "dist"), base_dir="PersonDetector")
+    zip_path = ROOT / "dist" / "CrackDetector"
+    shutil.make_archive(str(zip_path), "zip", root_dir=str(ROOT / "dist"), base_dir="CrackDetector")
     print("done")
 
     print()
     step("Build complete!")
     print()
     step(f"Output: {output}")
-    step(f"Run:    {output / 'PersonDetector.exe'}")
+    step(f"Run:    {output / 'CrackDetector.exe'}")
     step(f"Zip:    {zip_path}.zip")
     print()
 
