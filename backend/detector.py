@@ -124,9 +124,11 @@ class DetectionEngine:
             self._session_start = time.time()
             self._jpeg_frame = None
 
-        # start detection in a daemon thread
-        self._thread = threading.Thread(target=self._detection_loop, daemon=True)
-        self._thread.start()
+            # Create and start inside the lock so stop() can never see an
+            # unstarted Thread object and crash on join().
+            self._thread = threading.Thread(target=self._detection_loop, daemon=True)
+            self._thread.start()
+
         return {"status": "started"}
 
     def stop(self) -> dict:
@@ -152,6 +154,9 @@ class DetectionEngine:
             }
             self._session_start = None
             self._jpeg_frame = None
+            self._raw_frame = None
+            self._fps = 0.0
+            self._crack_count = 0
             # signal any waiting generator
             self._frame_event.set()
             return summary
@@ -228,7 +233,7 @@ class DetectionEngine:
                 return {"status": "error", "message": "No frame available"}
             frame = self._raw_frame.copy()
 
-        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S_%f")
         filename = f"detection_{timestamp}.jpg"
         filepath = SCREENSHOT_DIR / filename
         cv2.imwrite(str(filepath), frame)
