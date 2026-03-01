@@ -1,12 +1,10 @@
 @import "tailwindcss";
 
 @theme {
-  --color-background: #09090b;
-  --color-foreground: #fafafa;
+  --color-background: #07071a;
+  --color-foreground: #f0f0ff;
   --color-primary: #3b82f6;
   --color-primary-hover: #2563eb;
-  --color-card: #18181b;
-  --color-card-border: #27272a;
 }
 
 @layer base {
@@ -20,26 +18,38 @@
 
 @layer utilities {
   .glass {
-    background-color: rgba(255, 255, 255, 0.05);
-    backdrop-filter: blur(12px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    background: rgba(255, 255, 255, 0.06);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    box-shadow:
+      0 8px 32px rgba(0, 0, 0, 0.4),
+      inset 0 1px 0 rgba(255, 255, 255, 0.12);
   }
-  
+
+  .glass-strong {
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(32px);
+    -webkit-backdrop-filter: blur(32px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    box-shadow:
+      0 8px 32px rgba(0, 0, 0, 0.5),
+      inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  }
+
   .text-gradient {
     background-clip: text;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     color: transparent;
-    background-image: linear-gradient(to right, #60a5fa, #818cf8);
+    background-image: linear-gradient(135deg, #60a5fa 0%, #a78bfa 50%, #34d399 100%);
   }
 }
 
-/* Custom glowing effect for shapes */
-.glow-shape {
+.glow-blob {
   position: absolute;
-  filter: blur(80px);
-  z-index: -1;
   border-radius: 50%;
+  filter: blur(100px);
   pointer-events: none;
+  opacity: 0.55;
 }
