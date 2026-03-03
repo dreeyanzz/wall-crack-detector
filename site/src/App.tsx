@@ -12,16 +12,16 @@ function App() {
     <div className="min-h-screen relative overflow-hidden bg-background">
 
       {/* Background colour blobs */}
-      <div className="glow-blob w-[600px] h-[600px] bg-blue-600    top-[-150px] left-[-150px]" />
-      <div className="glow-blob w-[500px] h-[500px] bg-violet-600  top-[10%]    right-[-100px]" />
-      <div className="glow-blob w-[450px] h-[450px] bg-cyan-500    bottom-[5%]  left-[10%]" />
-      <div className="glow-blob w-[400px] h-[400px] bg-indigo-600  bottom-[-80px] right-[15%]" />
+      <div className="glow-blob w-[600px] h-[600px] bg-indigo-600  top-[-150px] left-[-150px]" />
+      <div className="glow-blob w-[500px] h-[500px] bg-violet-700  top-[10%]    right-[-100px]" />
+      <div className="glow-blob w-[450px] h-[450px] bg-indigo-800  bottom-[5%]  left-[10%]" />
+      <div className="glow-blob w-[400px] h-[400px] bg-violet-600  bottom-[-80px] right-[15%]" />
 
       {/* Navigation */}
       <nav className="w-full fixed top-0 z-50 px-6 py-4">
         <div className="max-w-5xl mx-auto glass-strong rounded-2xl px-6 py-3 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-violet-600 flex items-center justify-center shadow-lg">
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center shadow-lg">
               <Zap className="w-4 h-4 text-white" />
             </div>
             <span className="font-semibold text-lg tracking-tight text-white">Crack Detector</span>
@@ -45,10 +45,10 @@ function App() {
         <div className={`transition-all duration-1000 ${mounted ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'}`}>
 
           {/* Badge */}
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full glass text-blue-300 text-sm font-medium mb-8">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full glass text-indigo-300 text-sm font-medium mb-8">
             <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75" />
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-400" />
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75" />
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-indigo-400" />
             </span>
             v2.1.0 now available for Windows
           </div>
@@ -68,7 +68,7 @@ function App() {
             <a
               href="https://github.com/dreeyanzz/wall-crack-detector-releases/releases/latest/download/CrackDetector.zip"
               className="group flex items-center gap-3 px-8 py-4 rounded-2xl font-semibold text-white transition-all hover:scale-105
-                         bg-gradient-to-r from-blue-600 to-violet-600 hover:from-blue-500 hover:to-violet-500
+                         bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500
                          shadow-[0_0_40px_rgba(99,102,241,0.45)] hover:shadow-[0_0_60px_rgba(99,102,241,0.6)]"
             >
               <Download className="w-5 h-5 group-hover:-translate-y-0.5 transition-transform" />
@@ -89,7 +89,7 @@ function App() {
           <p className="text-center text-white/40 mb-12 text-sm">Everything you need, nothing you don't.</p>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             <FeatureCard
-              icon={<Shield className="w-6 h-6 text-blue-400" />}
+              icon={<Shield className="w-6 h-6 text-indigo-400" />}
               title="100% Local Inference"
               desc="Your data never leaves your machine. The YOLOv8 model runs completely offline, ensuring maximum privacy and compliance."
             />
@@ -99,12 +99,12 @@ function App() {
               desc="Connect a webcam or IP camera and get live crack segmentation with polygon masks rendered directly in the browser dashboard."
             />
             <FeatureCard
-              icon={<CheckCircle2 className="w-6 h-6 text-emerald-400" />}
+              icon={<CheckCircle2 className="w-6 h-6 text-indigo-300" />}
               title="Standalone Executable"
               desc="No Python environments, no installs. Everything is bundled into a single Windows executable — just unzip and run."
             />
             <FeatureCard
-              icon={<Monitor className="w-6 h-6 text-cyan-400" />}
+              icon={<Monitor className="w-6 h-6 text-violet-300" />}
               title="ESP32 Display Support"
               desc="Stream annotated frames directly to an ESP32-connected TFT display over your local network via the built-in /api/frame endpoint."
             />
