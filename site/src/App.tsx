@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Download, CheckCircle2, Shield, Zap, Monitor } from 'lucide-react';
+import { Download, CheckCircle2, Shield, Zap, Monitor, ExternalLink } from 'lucide-react';
 
 function App() {
   const [mounted, setMounted] = useState(false);
@@ -26,15 +26,18 @@ function App() {
             </div>
             <span className="font-semibold text-lg tracking-tight text-white">Crack Detector</span>
           </div>
-          <div className="hidden sm:flex text-sm text-white/60 gap-6">
+          <div className="hidden sm:flex text-sm text-white/60 gap-6 items-center">
             <a href="#features" className="hover:text-white transition-colors">Features</a>
+            <a href="https://github.com/dreeyanzz/wall-crack-detector" target="_blank" rel="noreferrer" className="hover:text-white transition-colors">
+              GitHub
+            </a>
             <a
-              href="https://github.com/dreeyanzz/wall-crack-detector"
+              href="https://dreeyanzz.vercel.app/"
               target="_blank"
               rel="noreferrer"
-              className="hover:text-white transition-colors"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg glass text-indigo-300 hover:text-white font-medium transition-all hover:scale-105"
             >
-              GitHub
+              Portfolio <ExternalLink className="w-3 h-3" />
             </a>
           </div>
         </div>
@@ -112,13 +115,35 @@ function App() {
         </div>
       </section>
 
+      {/* Built by */}
+      <section className="relative z-10 py-16 px-6">
+        <div className="max-w-5xl mx-auto">
+          <div className="glass-strong rounded-2xl px-8 py-10 flex flex-col sm:flex-row items-center justify-between gap-6">
+            <div>
+              <p className="text-white/40 text-sm uppercase tracking-widest font-medium mb-1">Built by</p>
+              <p className="text-2xl font-bold text-white">dreeyanzz</p>
+              <p className="text-white/50 text-sm mt-1">Check out my other projects and work</p>
+            </div>
+            <a
+              href="https://dreeyanzz.vercel.app/"
+              target="_blank"
+              rel="noreferrer"
+              className="flex items-center gap-2 px-6 py-3 rounded-xl font-semibold text-white transition-all hover:scale-105
+                         bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500
+                         shadow-[0_0_30px_rgba(99,102,241,0.4)] hover:shadow-[0_0_50px_rgba(99,102,241,0.6)]"
+            >
+              Visit Portfolio <ExternalLink className="w-4 h-4" />
+            </a>
+          </div>
+        </div>
+      </section>
+
       {/* Footer */}
-      <footer className="relative z-10 py-8 text-center">
-        <div className="glass mx-6 rounded-2xl py-5 max-w-5xl md:mx-auto">
+      <footer className="relative z-10 pb-8 px-6 text-center">
+        <div className="glass max-w-5xl mx-auto rounded-2xl py-5">
           <p className="text-white/30 text-sm">
             &copy; {new Date().getFullYear()} Crack Detector · Open Source · Built with React & YOLOv8
           </p>
-          <p className="text-white/20 text-xs mt-1">Made by <a href="https://dreeyanzz.vercel.app/" target="_blank" rel="noreferrer" className="hover:text-white/50 transition-colors underline underline-offset-2">dreeyanzz</a></p>
         </div>
       </footer>
 
