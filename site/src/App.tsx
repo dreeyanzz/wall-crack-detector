@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Download, CheckCircle2, Shield, Zap } from 'lucide-react';
+import { Download, CheckCircle2, Shield, Zap, Monitor } from 'lucide-react';
 
 function App() {
   const [mounted, setMounted] = useState(false);
@@ -50,7 +50,7 @@ function App() {
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75" />
               <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-400" />
             </span>
-            v2.0 now available for Windows
+            v2.1.0 now available for Windows
           </div>
 
           <h1 className="text-5xl md:text-7xl font-bold tracking-tight mb-6 max-w-4xl mx-auto leading-tight text-white">
@@ -87,7 +87,7 @@ function App() {
         <div className="max-w-5xl mx-auto">
           <h2 className="text-3xl font-bold text-center text-white mb-3">Why Crack Detector?</h2>
           <p className="text-center text-white/40 mb-12 text-sm">Everything you need, nothing you don't.</p>
-          <div className="grid md:grid-cols-3 gap-6">
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             <FeatureCard
               icon={<Shield className="w-6 h-6 text-blue-400" />}
               title="100% Local Inference"
@@ -102,6 +102,11 @@ function App() {
               icon={<CheckCircle2 className="w-6 h-6 text-emerald-400" />}
               title="Standalone Executable"
               desc="No Python environments, no installs. Everything is bundled into a single Windows executable — just unzip and run."
+            />
+            <FeatureCard
+              icon={<Monitor className="w-6 h-6 text-cyan-400" />}
+              title="ESP32 Display Support"
+              desc="Stream annotated frames directly to an ESP32-connected TFT display over your local network via the built-in /api/frame endpoint."
             />
           </div>
         </div>
