@@ -118,7 +118,7 @@ function App() {
           <p className="text-white/30 text-sm">
             &copy; {new Date().getFullYear()} Crack Detector · Open Source · Built with React & YOLOv8
           </p>
-          <p className="text-white/20 text-xs mt-1">Made by dreeyanzz</p>
+          <p className="text-white/20 text-xs mt-1">Made by <a href="https://dreeyanzz.vercel.app/" target="_blank" rel="noreferrer" className="hover:text-white/50 transition-colors underline underline-offset-2">dreeyanzz</a></p>
         </div>
       </footer>
 
