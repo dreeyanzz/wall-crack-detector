@@ -2,10 +2,10 @@ from fastapi import APIRouter, Body, HTTPException
 
 from backend.detector import DetectionEngine
 
-router = APIRouter()
-
 
 def create_router(engine: DetectionEngine) -> APIRouter:
+    router = APIRouter()
+
     @router.get("/settings")
     def get_settings():
         return engine.get_settings()

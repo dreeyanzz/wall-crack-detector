@@ -28,7 +28,7 @@ There is no linter configuration and no automated test suite.
 
 - **`app.py`** -- FastAPI application. Mounts API routes under `/api` and serves the built React static files for all other paths.
 - **`detector.py`** -- `DetectionEngine` class. Thread-safe crack detection using YOLOv8 segmentation (`model.predict()`). Runs detection in a daemon thread, draws polygon masks on frames, encodes to JPEG for MJPEG streaming. A single `threading.Lock` protects shared state; the lock is NOT held during the expensive `model.predict()` call.
-- **`routes/`** -- FastAPI routers split by concern: `stream.py` (MJPEG), `controls.py` (start/pause/stop), `settings.py`, `stats.py`, `screenshots.py`. Each uses a `create_router(engine)` factory pattern.
+- **`routes/`** -- FastAPI routers split by concern: `stream.py` (MJPEG + single-frame snapshot), `controls.py` (start/pause/stop), `settings.py`, `stats.py`, `screenshots.py`. Each uses a `create_router(engine)` factory pattern.
 
 ### Frontend (`frontend/`)
 
@@ -47,8 +47,19 @@ Camera -> OpenCV VideoCapture -> YOLOv8 model.predict()
   -> Segmentation masks (polygons per crack instance)
   -> Draw filled polygon overlays on frame -> cv2.imencode JPEG
   -> MJPEG StreamingResponse -> <img> in React frontend
+  -> GET /api/frame -> single JPEG snapshot (for ESP32/TFT)
   -> Stats polled via REST -> StatsPanel + SettingsPanel
 ```
+
+### ESP32 Display (`esp32/`)
+
+An Arduino sketch that polls `GET /api/frame` and renders the annotated JPEG on a 480×320 TFT display.
+
+- **`esp32/crack_display/crack_display.ino`** -- ESP32 sketch. Fetches `/api/frame` every ~150ms and draws it via `TJpg_Decoder` + `TFT_eSPI`.
+- Target display: 480×320 SPI TFT (ILI9488 driver). Pin wiring: CS→G5, RST→G4, DC→G15, MOSI→G23, SCK→G18, MISO→G19.
+- Required Arduino libraries: `TFT_eSPI` and `TJpg_Decoder` (both by Bodmer).
+- The server binds to `0.0.0.0` so LAN devices can reach it. The ESP32 uses the PC's LAN IP shown in the `Network:` line at startup.
+- `GET /api/frame?w=480&h=320` — returns the latest annotated JPEG resized to the given dimensions (defaults to 480×320). Returns `204` if detection hasn't started.
 
 ### Packaging (`build.py`, `run_exe.py`)
 
@@ -72,7 +83,7 @@ Two modes, switchable in the Settings panel:
 - Camera: built-in index 0 (switchable to IP Camera URL in UI)
 - JPEG quality: 80
 - Camera resolution: 1280x720 (set via cap.set; no-op on IP streams)
-- Server: 127.0.0.1:8000
+- Server: binds to `0.0.0.0:8000` (LAN-accessible); browser opens on `127.0.0.1:8000`
 - Color scheme: dark theme (gray-950) with `#00d4ff` cyan accent
 
 ### Model Files

@@ -251,6 +251,19 @@ class DetectionEngine:
     # MJPEG streaming
     # ------------------------------------------------------------------
 
+    def get_latest_frame(self, width: int | None = None, height: int | None = None) -> bytes | None:
+        """Return the latest annotated JPEG, optionally resized. Used by /api/frame."""
+        with self._lock:
+            if self._raw_frame is None:
+                return None
+            frame = self._raw_frame.copy()
+
+        if width and height:
+            frame = cv2.resize(frame, (width, height))
+
+        _, jpeg_buf = cv2.imencode(".jpg", frame, [cv2.IMWRITE_JPEG_QUALITY, 80])
+        return jpeg_buf.tobytes()
+
     def frame_generator(self):
         """Yields MJPEG multipart frames. Used by StreamingResponse."""
         while True:
